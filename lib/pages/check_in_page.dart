@@ -1,11 +1,10 @@
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:boat_support/dialogs/boat_pick.dart';
+import 'package:boat_support/dialogs/admin_verification.dart';
 import 'package:boat_support/dialogs/report_issue.dart';
 import 'package:boat_support/services/api_manager.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
-import '../dialogs/checkin/template.dart';
+import 'check_in_procedure.dart';
     
     class check_in_page extends StatefulWidget {
       const check_in_page({Key? key}) : super(key: key);
@@ -16,16 +15,8 @@ import '../dialogs/checkin/template.dart';
     
     class _check_in_pageState extends State<check_in_page> {
 
-      late Map boat_data = new Map();
-
       @override
       void initState(){
-        api_manager().getBoats(context).then((value) {
-          setState(() {
-            boat_data = value;
-          });
-        });
-
         super.initState();
       }
 
@@ -55,78 +46,85 @@ import '../dialogs/checkin/template.dart';
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     Padding(
-                      padding: EdgeInsets.fromLTRB(0, 19, 0, 0),
-                      child: Row(
+                      padding: const EdgeInsets.fromLTRB(0, 19, 0, 0),
+                      child: FutureBuilder (
+                          future:  api_manager().getBoats(context),
+                          builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                            if(snapshot.data == null){
+                              return Text("...");
+                            }
+                            else{
+                              Map boatData = snapshot.data;
+                              return Card(
+                                color: Colors.transparent,
+                                child: SizedBox(
+                                    height: MediaQuery.of(context).size.height / 7,
+                                    width: MediaQuery.of(context).size.width -10,
 
-                        children: <Widget>[
-                        Card(
-                          color: Colors.transparent,
-                          child: SizedBox(
-                              height: MediaQuery.of(context).size.height / 7,
-                              width: MediaQuery.of(context).size.width -10,
 
-
-                              child: Padding(
-                                padding: const EdgeInsets.only(top: 5.0),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                  children: <Widget>[
-                                    AutoSizeText(
-                                      boat_data["name"].toString(),
-
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 40,
-
-                                      ),
-                                    ),
-                                    CircleAvatar(
-                                      radius: 55.0,
-                                      backgroundImage:
-                                      NetworkImage(boat_data["images"][0]["url"]),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
-                                      child: Column(
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(top: 5.0),
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                         children: <Widget>[
                                           AutoSizeText(
-                                            boat_data["model"].toString(),
+                                            boatData["name"].toString(),
+
                                             style: const TextStyle(
                                               color: Colors.white,
-                                              fontSize: 20
+                                              fontSize: 40,
+
                                             ),
                                           ),
-                                          AutoSizeText(
-                                            boat_data["year"].toString(),
-                                            style: const TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 17
-                                            ),
+                                          CircleAvatar(
+                                            radius: 55.0,
+                                            backgroundImage:
+                                            NetworkImage(boatData["images"][0]["url"]),
                                           ),
-                                          AutoSizeText(
-                                            boat_data["company"].toString(),
-                                            style: const TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 17
+                                          Padding(
+                                            padding: const EdgeInsets.fromLTRB(0, 5, 0, 0),
+                                            child: Column(
+                                              children: <Widget>[
+                                                AutoSizeText(
+                                                  boatData["model"].toString(),
+                                                  style: const TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 20
+                                                  ),
+                                                ),
+                                                AutoSizeText(
+                                                  boatData["year"].toString(),
+                                                  style: const TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 17
+                                                  ),
+                                                ),
+                                                AutoSizeText(
+                                                  boatData["company"].toString(),
+                                                  style: const TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 17
+                                                  ),
+                                                ),
+                                              ],
                                             ),
-                                          ),
+                                          )
                                         ],
                                       ),
-                                    )
-                                  ],
-                                ),
-                              )),
+                                    )),
+                              );
+                            }
+
+                          },
                         ),
-                      ],
                       ),
-                    ),
                     ],
 
 
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.max,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
 
                     Expanded(
@@ -136,12 +134,26 @@ import '../dialogs/checkin/template.dart';
                         mainAxisSize: MainAxisSize.max,
                         children: const <Widget>[
 
+                          SizedBox(height: 50,),
+
                           AutoSizeText(
                             'Check-in \n Here',
 
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 60,
+
+                            ),
+                          ),
+
+                          SizedBox(height: 50,),
+
+                          AutoSizeText(
+                            'Help: \n    Marko Matic \n    099 219 392',
+
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 29,
 
                             ),
                           ),
@@ -162,12 +174,9 @@ import '../dialogs/checkin/template.dart';
                               height: MediaQuery.of(context).size.height / 10,
                               child: ElevatedButton(
                                 onPressed: () {
-                                  showDialog(
-                                      barrierDismissible: false,
-                                      context: context,
-                                      builder: (BuildContext context){
-                                        return DialogTemplate();
-                                      }
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => CheckIn()),
                                   );
                                 },
                                 child: const Align(
@@ -219,7 +228,15 @@ import '../dialogs/checkin/template.dart';
                             width: MediaQuery.of(context).size.width / 4,
                             height: MediaQuery.of(context).size.height / 10,
                             child: ElevatedButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                showDialog(
+                                    barrierDismissible: false,
+                                    context: context,
+                                    builder: (BuildContext context){
+                                      return AdminVerification();
+                                    }
+                                );
+                              },
                               child: const Align(
                                 alignment: Alignment.centerLeft,
                                 child: AutoSizeText("Settings"),

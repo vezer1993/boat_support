@@ -79,19 +79,28 @@ class DialogTemplateState extends State<DialogTemplate> {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       Flexible(
-                        child: CheckboxListTile(
-                          title: Text("title text"),
-                          value: checkedValue,
-                          onChanged: (newValue) {
-                            setState(() {
-                              checkedValue = newValue!;
-                            });
-                          },
-                          controlAffinity: ListTileControlAffinity.leading,  //  <-- leading Checkbox
+                        child: Transform.scale(
+                          scale: 1.5,
+                          child: CheckboxListTile(
+                            contentPadding: EdgeInsets.only(left: MediaQuery.of(context).size.width/ 7, bottom: 10),
+                            checkColor: Colors.white,
+                            title: const AutoSizeText(
+                                "title text",
+                              style: TextStyle(
+                                color: Colors.white
+                              ),
+                            )
+                            ,
+                            value: checkedValue,
+                            onChanged: (newValue) {
+                              setState(() {
+                                checkedValue = newValue!;
+                              });
+                            },
+                            controlAffinity: ListTileControlAffinity.leading,  //  <-- leading Checkbox
+                          ),
                         ),
                       ),
-
-                      AutoSizeText("hello"),
                     ],
                   ),
 
@@ -117,6 +126,9 @@ class DialogTemplateState extends State<DialogTemplate> {
 
                         ElevatedButton(
                           onPressed: (){
+                            if(checkedValue == false){
+                              showAlertDialog(context);
+                            }
                           },
                           child: const Align(
                             alignment: Alignment.center,
@@ -135,6 +147,41 @@ class DialogTemplateState extends State<DialogTemplate> {
             ),
           ]
       ),
+    );
+  }
+  showAlertDialog(BuildContext context) {
+
+    // set up the button
+    Widget okButton = TextButton(
+      child: Text("OK"),
+      onPressed: () {
+        Navigator.pop(context);
+      },
+    );
+
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      backgroundColor: const Color(0xFF202124),
+      title: Text("Alert",
+      style: TextStyle(
+          color: Colors.white,
+        fontSize: 25
+      ),),
+      content: Text("Please accept the terms",
+        style: TextStyle(
+            color: Colors.white
+        ),),
+      actions: [
+        okButton,
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
     );
   }
 }

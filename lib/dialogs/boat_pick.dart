@@ -4,6 +4,8 @@ import 'package:boat_support/services/api_manager.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../main.dart';
+
 class BoatPick extends StatefulWidget {
   final List BoatList;
 
@@ -35,7 +37,7 @@ class _BoatPickState extends State<BoatPick> {
           margin: const EdgeInsets.only(top: 20),
           decoration: BoxDecoration(
               shape: BoxShape.rectangle,
-              color: Colors.white,
+              color: const Color(0xFF202124),
               borderRadius: BorderRadius.circular(20),
               boxShadow: const [
                 BoxShadow(color: Colors.black,offset: Offset(0,5),
@@ -61,10 +63,18 @@ class _BoatPickState extends State<BoatPick> {
                     shrinkWrap: true,
                     itemBuilder: (context, index) {
                       return Card(
+                        color: const Color(0xFF202124),
+                          shape: const StadiumBorder(
+                            side: BorderSide(
+                              color: Colors.grey,
+                              width: 1.5,
+                            ),
+                          ),
                           child: ListTile(
                           onTap: () {
                             api_manager().selectBoat(widget.BoatList[index]);
-                            Navigator.of(context).push(MaterialPageRoute(builder: (context) => const check_in_page()));
+                            Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) =>
+                                const MyApp()), (Route<dynamic> route) => false);
                       },
                       title: Text(widget.BoatList[index]["name"].toString()),
                       subtitle: Text(widget.BoatList[index]["model"].toString()),

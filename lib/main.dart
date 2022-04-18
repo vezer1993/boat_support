@@ -1,9 +1,12 @@
+import 'dart:io';
+
 import 'package:boat_support/pages/check_in_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 
 void main() {
+  HttpOverrides.global = MyHttpOverrides();
   runApp(const MyApp());
 }
 
@@ -22,8 +25,19 @@ class MyApp extends StatelessWidget {
 
     return MaterialApp(
       title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
+      theme: ThemeData.light().copyWith(
+          checkboxTheme: CheckboxThemeData(
+            side: MaterialStateBorderSide.resolveWith(
+                    (_) => const BorderSide(width: 1, color: Colors.white)),
+            checkColor: MaterialStateProperty.all(Colors.white),
+          ),
+
+        textTheme: const TextTheme(
+          headline1: TextStyle(color: Colors.white, fontSize: 40, fontWeight: FontWeight.bold),
+          headline2: TextStyle(color: Colors.white, fontSize: 30, fontWeight: FontWeight.w400),
+          headline6: TextStyle(fontSize: 36.0, fontStyle: FontStyle.italic),
+        ),
+
         scaffoldBackgroundColor: const Color(0xFF000000),
           elevatedButtonTheme: ElevatedButtonThemeData(
               style: ElevatedButton.styleFrom(
@@ -157,5 +171,13 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
     );
+  }
+}
+
+class MyHttpOverrides extends HttpOverrides{
+  @override
+  HttpClient createHttpClient(SecurityContext? context){
+    return super.createHttpClient(context)
+      ..badCertificateCallback = (X509Certificate cert, String host, int port)=> true;
   }
 }
